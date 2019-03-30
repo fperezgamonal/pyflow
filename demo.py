@@ -17,8 +17,11 @@ parser.add_argument(
     help='Visualize (i.e. save) output of flow.')
 args = parser.parse_args()
 
-im1 = np.array(Image.open('examples/car1.jpg'))
-im2 = np.array(Image.open('examples/car2.jpg'))
+#im1 = np.array(Image.open('examples/car1.jpg'))
+#im2 = np.array(Image.open('examples/car2.jpg'))
+im1 = np.array(Image.open('/homedtic/fperez/Documents/sample_data/kitti2012_seq45/frames/gray/000045_10.png').convert('LA'))
+im2 = np.array(Image.open('/homedtic/fperez/Documents/sample_data/kitti2012_seq45/frames/gray/000045_11.png').convert('LA'))
+print(im1.shape)
 im1 = im1.astype(float) / 255.
 im2 = im2.astype(float) / 255.
 
@@ -29,8 +32,9 @@ minWidth = 20
 nOuterFPIterations = 7
 nInnerFPIterations = 1
 nSORIterations = 30
-colType = 0  # 0 or default:RGB, 1:GRAY (but pass gray image with shape (h,w,1))
+colType = 1  # 0 or default:RGB, 1:GRAY (but pass gray image with shape (h,w,1))
 
+print("image shape: {0}".format(im1.shape))
 s = time.time()
 u, v, im2W = pyflow.coarse2fine_flow(
     im1, im2, alpha, ratio, minWidth, nOuterFPIterations, nInnerFPIterations,
@@ -39,7 +43,7 @@ e = time.time()
 print('Time Taken: %.2f seconds for image of size (%d, %d, %d)' % (
     e - s, im1.shape[0], im1.shape[1], im1.shape[2]))
 flow = np.concatenate((u[..., None], v[..., None]), axis=2)
-np.save('examples/outFlow.npy', flow)
+np.save('examples/outFlow_gray.npy', flow)
 
 if args.viz:
     import cv2
@@ -50,5 +54,5 @@ if args.viz:
     hsv[..., 0] = ang * 180 / np.pi / 2
     hsv[..., 2] = cv2.normalize(mag, None, 0, 255, cv2.NORM_MINMAX)
     rgb = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
-    cv2.imwrite('examples/outFlow_new.png', rgb)
-    cv2.imwrite('examples/car2Warped_new.jpg', im2W[:, :, ::-1] * 255)
+    cv2.imwrite('examples/outFlow_new_gray.png', rgb)
+    cv2.imwrite('examples/car2Warped_new_gray.jpg', im2W[:, :, ::-1] * 255)
